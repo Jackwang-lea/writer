@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { Icon } from '@iconify/react'
 import { toast } from 'react-hot-toast'
+import SidebarKnowledgeSection from './SidebarKnowledgeSection'
 
 
 interface ExpandedItems {
@@ -403,26 +404,10 @@ const Sidebar = () => {
         )}
 
         {/* 知识库部分 */}
-        <div className="font-bold text-lg mt-6 mb-2 flex justify-between items-center hover:bg-gray-50 p-2 rounded-md">
-          <span 
-            className="cursor-pointer flex items-center" 
-            onClick={() => handleKnowledgeItemClick()}
-          >
-            <Icon 
-              icon="ri:arrow-right-s-line" 
-              className="w-5 h-5 mr-1 text-gray-500"
-            />
-            知识库
-          </span>
-          <Icon 
-            icon="ri:add-line" 
-            className="w-5 h-5 text-gray-500 cursor-pointer"
-            onClick={(e) => {
-              e.stopPropagation()
-              showToast()
-            }}
-          />
-        </div>
+        <SidebarKnowledgeSection
+          onKnowledgeItemClick={handleKnowledgeItemClick}
+          showToast={showToast}
+        />
         
         {/* 工作流部分 */}
         <div className="font-bold text-lg mt-6 mb-2 flex justify-between items-center hover:bg-gray-50 p-2 rounded-md">
