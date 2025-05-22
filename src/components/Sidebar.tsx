@@ -180,11 +180,6 @@ const Sidebar = () => {
     showToast()
   }
 
-  // 处理知识库项点击
-  const handleKnowledgeItemClick = () => {
-    showToast()
-  }
-
   // 处理脚本点击
   const handleScriptClick = () => {
     showToast()
@@ -404,10 +399,7 @@ const Sidebar = () => {
         )}
 
         {/* 知识库部分 */}
-        <SidebarKnowledgeSection
-          onKnowledgeItemClick={handleKnowledgeItemClick}
-          showToast={showToast}
-        />
+        <SidebarKnowledgeSection />
         
         {/* 工作流部分 */}
         <div className="font-bold text-lg mt-6 mb-2 flex justify-between items-center hover:bg-gray-50 p-2 rounded-md">
