@@ -2,6 +2,82 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Icon } from '@iconify/react';
 
+// 文件上传模态框组件
+interface UploadModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onNext: (type: 'text' | 'image' | 'online' | 'notion' | 'custom') => void;
+}
+
+function UploadModal({ isOpen, onClose, onNext }: UploadModalProps) {
+  const [selectedType, setSelectedType] = useState<'text' | 'image' | 'online' | 'notion' | 'custom'>('text');
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg w-[700px] max-w-screen-md shadow-xl">
+        <div className="flex justify-between items-center p-5 border-b">
+          <h2 className="text-xl font-medium">新增单元</h2>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700"
+          >
+            <Icon icon="ri:close-line" className="w-6 h-6" />
+          </button>
+        </div>
+
+        <div className="p-6">
+          {/* 文件类型选项卡 */}
+          <div className="flex border-b mb-6">
+            <button 
+              className={`px-5 py-3 flex items-center ${selectedType === 'text' || selectedType === 'image' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-gray-600'}`}
+              onClick={() => setSelectedType('text')}
+            >
+              <Icon icon="ri:file-text-line" className="w-5 h-5 mr-2" />
+              文本格式
+            </button>
+          </div>
+
+          {/* 选项区域 */}
+          <div className="space-y-4">
+            {/* 本地文档 */}
+            <div 
+              className={`p-6 border rounded-lg flex items-center cursor-pointer hover:border-indigo-300 ${selectedType === 'text' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200'}`}
+              onClick={() => setSelectedType('text')}
+            >
+              <div className="w-6 h-6 mr-3 relative">
+                <div className={`w-6 h-6 rounded-full ${selectedType === 'text' ? 'bg-indigo-600' : 'border border-gray-300'} flex items-center justify-center`}>
+                  {selectedType === 'text' && <div className="w-3 h-3 bg-white rounded-full"></div>}
+                </div>
+              </div>
+              <div className="flex-grow">
+                <div className="font-medium">本地文档</div>
+                <div className="text-sm text-gray-500 mt-1">上传 PDF, TXT, DOCX 格式的本地文件</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex justify-end px-6 py-4 bg-gray-50 rounded-b-lg">
+          <button 
+            className="px-4 py-2 text-gray-600 mr-2 hover:bg-gray-200 rounded-md"
+            onClick={onClose}
+          >
+            取消
+          </button>
+          <button 
+            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+            onClick={() => onNext(selectedType)}
+          >
+            下一步
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // 知识库页面
 function KnowledgeDetailPage() {
   const { knowledgeId } = useParams<{ knowledgeId: string }>();
@@ -19,6 +95,15 @@ function KnowledgeDetailPage() {
   
   const [searchText, setSearchText] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  
+  const handleNextStep = (type: 'text' | 'image' | 'online' | 'notion' | 'custom') => {
+    // 处理下一步逻辑
+    console.log('选择了类型:', type);
+    setShowUploadModal(false);
+    // 这里可以根据类型进行不同的处理
+    alert(`选择了${type}类型，将进入下一步`);
+  };
   
   if (!knowledge) {
     return (
@@ -95,7 +180,10 @@ function KnowledgeDetailPage() {
               <span>召回评测</span>
             </button>
             
-            <button className="flex items-center gap-1 px-3 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+            <button 
+              className="flex items-center gap-1 px-3 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+              onClick={() => setShowUploadModal(true)}
+            >
               <Icon icon="ri:add-line" className="w-5 h-5" />
               <span>添加</span>
             </button>
@@ -175,6 +263,13 @@ function KnowledgeDetailPage() {
           </div>
         </div>
       </div>
+      
+      {/* 文件上传模态框 */}
+      <UploadModal 
+        isOpen={showUploadModal}
+        onClose={() => setShowUploadModal(false)}
+        onNext={handleNextStep}
+      />
     </div>
   );
 }
