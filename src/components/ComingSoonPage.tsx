@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Icon } from '@iconify/react';
+import { useNavigate } from 'react-router-dom';
 
 // 知识库类型
 interface KnowledgeBase {
@@ -147,6 +148,7 @@ function ComingSoonPage() {
   const [showModal, setShowModal] = useState(false);
   const [editingKnowledge, setEditingKnowledge] = useState<KnowledgeBase | null>(null);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const navigate = useNavigate();
   
   // 初始知识库数据
   const [knowledgeBases, setKnowledgeBases] = useState<KnowledgeBase[]>([
@@ -207,6 +209,11 @@ function ComingSoonPage() {
     }
   };
   
+  // 处理知识库卡片点击
+  const handleKnowledgeClick = (kb: KnowledgeBase) => {
+    navigate(`/knowledge/${kb.id}`);
+  };
+  
   return (
     <div className="p-10 h-full bg-gray-50" onClick={handleOutsideClick}>
       <div className="grid grid-cols-4 gap-6">
@@ -227,7 +234,11 @@ function ComingSoonPage() {
         
         {/* 已有知识库卡片 */}
         {knowledgeBases.map(kb => (
-          <div key={kb.id} className="bg-white rounded-lg shadow-sm h-60 flex flex-col">
+          <div 
+            key={kb.id} 
+            className="bg-white rounded-lg shadow-sm h-60 flex flex-col cursor-pointer hover:shadow-md"
+            onClick={() => handleKnowledgeClick(kb)}
+          >
             <div className="p-4 flex justify-between items-center">
               <div className="flex items-center">
                 <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mr-3">
