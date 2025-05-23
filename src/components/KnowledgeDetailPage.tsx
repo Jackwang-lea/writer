@@ -53,7 +53,7 @@ function UploadModal({ isOpen, onClose, onNext }: UploadModalProps) {
               </div>
               <div className="flex-grow">
                 <div className="font-medium">本地文档</div>
-                <div className="text-sm text-gray-500 mt-1">上传 PDF, TXT, DOCX 格式的本地文件</div>
+                <div className="text-sm text-gray-500 mt-1">上传 PDF, TXT, DOCX,HTML 格式的本地文件</div>
               </div>
             </div>
           </div>
