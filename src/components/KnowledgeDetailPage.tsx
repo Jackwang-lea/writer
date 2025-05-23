@@ -98,11 +98,10 @@ function KnowledgeDetailPage() {
   const [showUploadModal, setShowUploadModal] = useState(false);
   
   const handleNextStep = (type: 'text' | 'image' | 'online' | 'notion' | 'custom') => {
-    // 处理下一步逻辑
-    console.log('选择了类型:', type);
+    // 关闭当前模态框
     setShowUploadModal(false);
-    // 这里可以根据类型进行不同的处理
-    alert(`选择了${type}类型，将进入下一步`);
+    // 跳转到上传页面
+    navigate(`/knowledge/${knowledgeId}/upload`);
   };
   
   if (!knowledge) {

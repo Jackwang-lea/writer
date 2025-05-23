@@ -9,6 +9,7 @@ import ChaptersPage from './components/ChaptersPage'
 import HomePage from './components/HomePage'
 import ComingSoonPage from './components/ComingSoonPage'
 import KnowledgeDetailPage from './components/KnowledgeDetailPage'
+import KnowledgeUploadPage from './components/KnowledgeUploadPage'
 import App from './App'
 
 // 使用HashRouter而不是BrowserRouter，可以避免部署时的路径问题
@@ -57,6 +58,10 @@ const router = createHashRouter([
       {
         path: 'knowledge/:knowledgeId',
         element: <KnowledgeDetailPage />
+      },
+      {
+        path: 'knowledge/:knowledgeId/upload',
+        element: <KnowledgeUploadPage />
       }
     ]
   }
