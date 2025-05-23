@@ -4,36 +4,6 @@ import { toast } from 'react-hot-toast'
 import SidebarKnowledgeSection from './SidebarKnowledgeSection'
 import { useSidebarWorks } from '../hooks/useSidebarWorks'
 
-
-interface ExpandedItems {
-  [key: string]: boolean
-}
-
-interface Script {
-  id: string
-  name: string
-}
-
-interface Character {
-  id: string
-  name: string
-  type: 'draft' | 'final'
-  scripts?: Script[]
-}
-
-interface Work {
-  id: string
-  name: string
-  lastVisitedView?: string
-  characters?: Character[]
-  views: {
-    outline: boolean
-    characters: boolean
-    hostManual: boolean
-    materials: boolean
-  }
-}
-
 const Sidebar = () => {
   const {
     expandedItems,

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
+import type { Work, ExpandedItems } from '../types/work';
 
 export interface Script {
   id: string;
@@ -11,23 +12,6 @@ export interface Character {
   name: string;
   type: string;
   scripts?: Script[];
-}
-
-export interface Work {
-  id: string;
-  name: string;
-  views: {
-    outline: boolean;
-    characters: boolean;
-    hostManual: boolean;
-    materials: boolean;
-  };
-  characters?: Character[];
-  lastVisitedView?: string;
-}
-
-export interface ExpandedItems {
-  [key: string]: boolean;
 }
 
 export function useSidebarWorks() {
