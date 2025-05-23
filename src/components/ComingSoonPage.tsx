@@ -1,17 +1,41 @@
 import { useState } from 'react';
 import { Icon } from '@iconify/react';
 
+// 知识库类型
+interface KnowledgeBase {
+  id: string;
+  name: string;
+  icon: string;
+  count: number;
+  linkedIdeas: number;
+  description?: string;
+}
+
 // 创建知识库弹窗组件
 interface CreateKnowledgeModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (name: string, description: string, icon: string) => void;
+  editingKnowledge: KnowledgeBase | null;
 }
 
-function CreateKnowledgeModal({ isOpen, onClose, onSave }: CreateKnowledgeModalProps) {
+function CreateKnowledgeModal({ isOpen, onClose, onSave, editingKnowledge }: CreateKnowledgeModalProps) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [selectedIcon, setSelectedIcon] = useState('ri:book-3-line');
+  
+  // 当编辑模式改变时，更新表单数据
+  useState(() => {
+    if (editingKnowledge) {
+      setName(editingKnowledge.name);
+      setDescription(editingKnowledge.description || '');
+      setSelectedIcon(editingKnowledge.icon);
+    } else {
+      setName('');
+      setDescription('');
+      setSelectedIcon('ri:book-3-line');
+    }
+  });
   
   // 可选的图标列表
   const icons = [
@@ -34,12 +58,16 @@ function CreateKnowledgeModal({ isOpen, onClose, onSave }: CreateKnowledgeModalP
   };
 
   if (!isOpen) return null;
+  
+  // 设置正确的标题文本
+  const titleText = editingKnowledge ? '编辑知识库' : '创建知识库';
+  const buttonText = editingKnowledge ? '保存' : '创建';
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg w-[500px] shadow-xl">
         <div className="flex justify-between items-center p-4 border-b">
-          <h2 className="text-lg font-medium">创建知识库</h2>
+          <h2 className="text-lg font-medium">{titleText}</h2>
           <Icon 
             icon="ri:close-line" 
             className="w-6 h-6 cursor-pointer text-gray-500 hover:text-gray-700"
@@ -94,7 +122,7 @@ function CreateKnowledgeModal({ isOpen, onClose, onSave }: CreateKnowledgeModalP
           </div>
           
           {/* 按钮 */}
-          <div className="flex justify-end">
+          <div className="flex justify-end p-6">
             <button
               className="px-4 py-2 text-gray-600 bg-gray-100 rounded-md mr-2 hover:bg-gray-200"
               onClick={onClose}
@@ -106,7 +134,7 @@ function CreateKnowledgeModal({ isOpen, onClose, onSave }: CreateKnowledgeModalP
               onClick={handleSave}
               disabled={!name.trim()}
             >
-              创建
+              {buttonText}
             </button>
           </div>
         </div>
@@ -117,8 +145,11 @@ function CreateKnowledgeModal({ isOpen, onClose, onSave }: CreateKnowledgeModalP
 
 function ComingSoonPage() {
   const [showModal, setShowModal] = useState(false);
+  const [editingKnowledge, setEditingKnowledge] = useState<KnowledgeBase | null>(null);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  
   // 初始知识库数据
-  const [knowledgeBases, setKnowledgeBases] = useState([
+  const [knowledgeBases, setKnowledgeBases] = useState<KnowledgeBase[]>([
     { id: '1', name: '测试', icon: 'ri:book-3-line', count: 0, linkedIdeas: 0 },
     { id: '2', name: '对话记录', icon: 'ri:chat-3-line', count: 0, linkedIdeas: 0 },
     { id: '3', name: '角色剧本', icon: 'ri:file-list-line', count: 6, linkedIdeas: 0 },
@@ -126,33 +157,67 @@ function ComingSoonPage() {
   ]);
   
   const handleCreateKnowledge = (name: string, description: string, icon: string) => {
-    // 生成一个新ID
-    const newId = `kb-${Date.now()}`;
-    
-    // 创建新的知识库对象
-    const newKnowledgeBase = {
-      id: newId,
-      name: name,
-      icon: icon,
-      count: 0,
-      linkedIdeas: 0,
-      description: description // 存储描述，虽然UI上暂不显示
-    };
-    
-    // 添加到现有列表中
-    setKnowledgeBases(prev => [...prev, newKnowledgeBase]);
-    
+    if (editingKnowledge) {
+      // 更新现有知识库
+      setKnowledgeBases(prev => 
+        prev.map(kb => kb.id === editingKnowledge.id 
+          ? { ...kb, name, description, icon }
+          : kb
+        )
+      );
+      setEditingKnowledge(null);
+    } else {
+      // 创建新知识库
+      const newId = `kb-${Date.now()}`;
+      const newKnowledgeBase = {
+        id: newId,
+        name: name,
+        icon: icon,
+        count: 0,
+        linkedIdeas: 0,
+        description: description
+      };
+      setKnowledgeBases(prev => [...prev, newKnowledgeBase]);
+    }
     // 成功提示
-    alert(`创建成功: ${name}`);
+    alert(editingKnowledge ? `更新成功: ${name}` : `创建成功: ${name}`);
+  };
+  
+  const handleEditKnowledge = (knowledge: KnowledgeBase) => {
+    setEditingKnowledge(knowledge);
+    setShowModal(true);
+    setActiveDropdown(null);
+  };
+  
+  const handleDeleteKnowledge = (id: string) => {
+    if (confirm('确定要删除此知识库吗？')) {
+      setKnowledgeBases(prev => prev.filter(kb => kb.id !== id));
+    }
+    setActiveDropdown(null);
+  };
+  
+  const toggleDropdown = (id: string) => {
+    setActiveDropdown(activeDropdown === id ? null : id);
+  };
+  
+  // Close dropdown when clicking outside
+  const handleOutsideClick = () => {
+    if (activeDropdown) {
+      setActiveDropdown(null);
+    }
   };
   
   return (
-    <div className="p-10 h-full bg-gray-50">
+    <div className="p-10 h-full bg-gray-50" onClick={handleOutsideClick}>
       <div className="grid grid-cols-4 gap-6">
         {/* 创建知识库卡片 */}
         <div 
           className="bg-white rounded-lg p-6 h-60 shadow-sm flex flex-col items-center justify-center cursor-pointer hover:shadow-md transition-shadow"
-          onClick={() => setShowModal(true)}
+          onClick={(e) => {
+            e.stopPropagation();
+            setEditingKnowledge(null);
+            setShowModal(true);
+          }}
         >
           <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-3">
             <Icon icon="ri:add-line" className="w-6 h-6 text-gray-600" />
@@ -170,7 +235,44 @@ function ComingSoonPage() {
                 </div>
                 <div className="font-medium">{kb.name}</div>
               </div>
-              <Icon icon="ri:more-fill" className="w-5 h-5 text-gray-400 cursor-pointer" />
+              <div className="relative">
+                <Icon 
+                  icon="ri:more-fill" 
+                  className="w-5 h-5 text-gray-400 cursor-pointer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleDropdown(kb.id);
+                  }}
+                />
+                
+                {/* 下拉菜单 */}
+                {activeDropdown === kb.id && (
+                  <div className="absolute right-0 mt-1 w-32 bg-white rounded-md shadow-lg z-10 overflow-hidden">
+                    <div className="py-1">
+                      <div 
+                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditKnowledge(kb);
+                        }}
+                      >
+                        <Icon icon="ri:edit-line" className="w-4 h-4 mr-2" />
+                        编辑
+                      </div>
+                      <div 
+                        className="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100 cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteKnowledge(kb.id);
+                        }}
+                      >
+                        <Icon icon="ri:delete-bin-line" className="w-4 h-4 mr-2" />
+                        删除
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
             
             <div className="flex-grow"></div>
@@ -185,8 +287,12 @@ function ComingSoonPage() {
       
       <CreateKnowledgeModal 
         isOpen={showModal}
-        onClose={() => setShowModal(false)}
+        onClose={() => {
+          setShowModal(false);
+          setEditingKnowledge(null);
+        }}
         onSave={handleCreateKnowledge}
+        editingKnowledge={editingKnowledge}
       />
     </div>
   );
