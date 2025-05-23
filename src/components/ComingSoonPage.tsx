@@ -117,20 +117,34 @@ function CreateKnowledgeModal({ isOpen, onClose, onSave }: CreateKnowledgeModalP
 
 function ComingSoonPage() {
   const [showModal, setShowModal] = useState(false);
-  
-  const handleCreateKnowledge = (name: string, description: string, icon: string) => {
-    console.log('创建知识库:', { name, description, icon });
-    // 这里可以添加真实的创建逻辑
-    alert(`创建成功: ${name}`);
-  };
-  
-  // 模拟已有的知识库数据
-  const knowledgeBases = [
+  // 初始知识库数据
+  const [knowledgeBases, setKnowledgeBases] = useState([
     { id: '1', name: '测试', icon: 'ri:book-3-line', count: 0, linkedIdeas: 0 },
     { id: '2', name: '对话记录', icon: 'ri:chat-3-line', count: 0, linkedIdeas: 0 },
     { id: '3', name: '角色剧本', icon: 'ri:file-list-line', count: 6, linkedIdeas: 0 },
     { id: '4', name: '大纲', icon: 'ri:archive-line', count: 1, linkedIdeas: 0 }
-  ];
+  ]);
+  
+  const handleCreateKnowledge = (name: string, description: string, icon: string) => {
+    // 生成一个新ID
+    const newId = `kb-${Date.now()}`;
+    
+    // 创建新的知识库对象
+    const newKnowledgeBase = {
+      id: newId,
+      name: name,
+      icon: icon,
+      count: 0,
+      linkedIdeas: 0,
+      description: description // 存储描述，虽然UI上暂不显示
+    };
+    
+    // 添加到现有列表中
+    setKnowledgeBases(prev => [...prev, newKnowledgeBase]);
+    
+    // 成功提示
+    alert(`创建成功: ${name}`);
+  };
   
   return (
     <div className="p-10 h-full bg-gray-50">
