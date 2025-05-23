@@ -1,16 +1,6 @@
 import { useState } from 'react';
 import { Icon } from '@iconify/react';
-import { useNavigate } from 'react-router-dom';
-
-// 知识库类型
-interface KnowledgeBase {
-  id: string;
-  name: string;
-  icon: string;
-  count: number;
-  linkedIdeas: number;
-  description?: string;
-}
+import { useKnowledgeBase, KnowledgeBase } from '../hooks/useKnowledgeBase';
 
 // 创建知识库弹窗组件
 interface CreateKnowledgeModalProps {
@@ -146,165 +136,109 @@ function CreateKnowledgeModal({ isOpen, onClose, onSave, editingKnowledge }: Cre
 
 function ComingSoonPage() {
   const [showModal, setShowModal] = useState(false);
-  const [editingKnowledge, setEditingKnowledge] = useState<KnowledgeBase | null>(null);
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-  const navigate = useNavigate();
   
-  // 初始知识库数据
-  const [knowledgeBases, setKnowledgeBases] = useState<KnowledgeBase[]>([
-    { id: '1', name: '测试', icon: 'ri:book-3-line', count: 0, linkedIdeas: 0 },
-    { id: '2', name: '对话记录', icon: 'ri:chat-3-line', count: 0, linkedIdeas: 0 },
-    { id: '3', name: '角色剧本', icon: 'ri:file-list-line', count: 6, linkedIdeas: 0 },
-    { id: '4', name: '大纲', icon: 'ri:archive-line', count: 1, linkedIdeas: 0 }
-  ]);
-  
-  const handleCreateKnowledge = (name: string, description: string, icon: string) => {
-    if (editingKnowledge) {
-      // 更新现有知识库
-      setKnowledgeBases(prev => 
-        prev.map(kb => kb.id === editingKnowledge.id 
-          ? { ...kb, name, description, icon }
-          : kb
-        )
-      );
-      setEditingKnowledge(null);
-    } else {
-      // 创建新知识库
-      const newId = `kb-${Date.now()}`;
-      const newKnowledgeBase = {
-        id: newId,
-        name: name,
-        icon: icon,
-        count: 0,
-        linkedIdeas: 0,
-        description: description
-      };
-      setKnowledgeBases(prev => [...prev, newKnowledgeBase]);
-    }
-    // 成功提示
-    alert(editingKnowledge ? `更新成功: ${name}` : `创建成功: ${name}`);
+  const {
+    knowledgeBases,
+    editingKnowledge,
+    activeDropdown,
+    handleCreateKnowledge,
+    handleEditKnowledge,
+    handleDeleteKnowledge,
+    handleKnowledgeClick,
+    toggleDropdown,
+    handleOutsideClick,
+    setEditingKnowledge
+  } = useKnowledgeBase();
+
+  // 渲染知识库卡片
+  const renderKnowledgeCard = (kb: KnowledgeBase) => {
+    return (
+      <div 
+        key={kb.id}
+        className="bg-white rounded-lg p-4 cursor-pointer hover:shadow-md transition-shadow"
+        onClick={() => handleKnowledgeClick(kb)}
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
+              <Icon icon={kb.icon} className="w-6 h-6 text-indigo-600" />
+            </div>
+            <div className="ml-3">
+              <div className="font-medium">{kb.name}</div>
+              <div className="text-sm text-gray-500">{kb.count} 文档 · {kb.linkedIdeas} 关联创作</div>
+            </div>
+          </div>
+          
+          <div className="relative">
+            <button
+              className="p-2 hover:bg-gray-100 rounded-full"
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleDropdown(kb.id);
+              }}
+            >
+              <Icon icon="ri:more-fill" className="w-5 h-5 text-gray-400" />
+            </button>
+            
+            {activeDropdown === kb.id && (
+              <div className="absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg z-10">
+                <div className="py-1">
+                  <button
+                    className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEditKnowledge(kb);
+                    }}
+                  >
+                    编辑
+                  </button>
+                  <button
+                    className="block w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteKnowledge(kb.id);
+                    }}
+                  >
+                    删除
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
   };
-  
-  const handleEditKnowledge = (knowledge: KnowledgeBase) => {
-    setEditingKnowledge(knowledge);
-    setShowModal(true);
-    setActiveDropdown(null);
-  };
-  
-  const handleDeleteKnowledge = (id: string) => {
-    if (confirm('确定要删除此知识库吗？')) {
-      setKnowledgeBases(prev => prev.filter(kb => kb.id !== id));
-    }
-    setActiveDropdown(null);
-  };
-  
-  const toggleDropdown = (id: string) => {
-    setActiveDropdown(activeDropdown === id ? null : id);
-  };
-  
-  // Close dropdown when clicking outside
-  const handleOutsideClick = () => {
-    if (activeDropdown) {
-      setActiveDropdown(null);
-    }
-  };
-  
-  // 处理知识库卡片点击
-  const handleKnowledgeClick = (kb: KnowledgeBase) => {
-    navigate(`/knowledge/${kb.id}`);
-  };
-  
+
   return (
-    <div className="p-10 h-full bg-gray-50" onClick={handleOutsideClick}>
-      <div className="grid grid-cols-4 gap-6">
-        {/* 创建知识库卡片 */}
-        <div 
-          className="bg-white rounded-lg p-6 h-60 shadow-sm flex flex-col items-center justify-center cursor-pointer hover:shadow-md transition-shadow"
-          onClick={(e) => {
-            e.stopPropagation();
+    <div className="p-6" onClick={handleOutsideClick}>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-medium">知识库</h1>
+        <button
+          className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+          onClick={() => {
             setEditingKnowledge(null);
             setShowModal(true);
           }}
         >
-          <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-3">
-            <Icon icon="ri:add-line" className="w-6 h-6 text-gray-600" />
-          </div>
-          <div className="text-gray-600 text-sm">创建知识库</div>
-        </div>
-        
-        {/* 已有知识库卡片 */}
-        {knowledgeBases.map(kb => (
-          <div 
-            key={kb.id} 
-            className="bg-white rounded-lg shadow-sm h-60 flex flex-col cursor-pointer hover:shadow-md"
-            onClick={() => handleKnowledgeClick(kb)}
-          >
-            <div className="p-4 flex justify-between items-center">
-              <div className="flex items-center">
-                <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mr-3">
-                  <Icon icon={kb.icon} className="w-5 h-5 text-indigo-500" />
-                </div>
-                <div className="font-medium">{kb.name}</div>
-              </div>
-              <div className="relative">
-                <Icon 
-                  icon="ri:more-fill" 
-                  className="w-5 h-5 text-gray-400 cursor-pointer"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleDropdown(kb.id);
-                  }}
-                />
-                
-                {/* 下拉菜单 */}
-                {activeDropdown === kb.id && (
-                  <div className="absolute right-0 mt-1 w-32 bg-white rounded-md shadow-lg z-10 overflow-hidden">
-                    <div className="py-1">
-                      <div 
-                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEditKnowledge(kb);
-                        }}
-                      >
-                        <Icon icon="ri:edit-line" className="w-4 h-4 mr-2" />
-                        编辑
-                      </div>
-                      <div 
-                        className="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100 cursor-pointer"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteKnowledge(kb.id);
-                        }}
-                      >
-                        <Icon icon="ri:delete-bin-line" className="w-4 h-4 mr-2" />
-                        删除
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-            
-            <div className="flex-grow"></div>
-            
-            <div className="p-4 border-t border-gray-100 text-sm text-gray-500 flex justify-between">
-              <div>{kb.count} 文档</div>
-              <div>{kb.linkedIdeas} 关联 IDEAs</div>
-            </div>
-          </div>
-        ))}
+          <Icon icon="ri:add-line" className="w-5 h-5 mr-1" />
+          <span>新建知识库</span>
+        </button>
       </div>
-      
-      <CreateKnowledgeModal 
-        isOpen={showModal}
-        onClose={() => {
-          setShowModal(false);
-          setEditingKnowledge(null);
-        }}
-        onSave={handleCreateKnowledge}
-        editingKnowledge={editingKnowledge}
-      />
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {knowledgeBases.map(renderKnowledgeCard)}
+      </div>
+
+      {/* 创建/编辑知识库模态框 */}
+      {showModal && (
+        <CreateKnowledgeModal
+          isOpen={showModal}
+          onClose={() => setShowModal(false)}
+          onSave={handleCreateKnowledge}
+          editingKnowledge={editingKnowledge}
+        />
+      )}
     </div>
   );
 }
