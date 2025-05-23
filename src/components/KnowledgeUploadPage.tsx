@@ -19,6 +19,10 @@ function KnowledgeUploadPage() {
   const [showTagsDropdown, setShowTagsDropdown] = useState(false);
   // 选择的标签列表
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  // 新标签输入
+  const [newTagInput, setNewTagInput] = useState('');
+  // 是否显示新标签输入
+  const [showNewTagInput, setShowNewTagInput] = useState(false);
   
   // 处理下一步
   const handleNext = () => {
@@ -35,10 +39,14 @@ function KnowledgeUploadPage() {
   
   // 添加标签
   const handleAddTag = (tag: string) => {
+    if (!tag.trim()) return;
+    
     if (!selectedTags.includes(tag)) {
       setSelectedTags([...selectedTags, tag]);
     }
     setShowTagsDropdown(false);
+    setNewTagInput('');
+    setShowNewTagInput(false);
   };
   
   // 移除标签
@@ -104,6 +112,51 @@ function KnowledgeUploadPage() {
       
       {/* 主内容区域 */}
       <div className="max-w-[800px] mx-auto px-6 pb-10 pt-8">
+        {/* 文件上传区域 - 移到中间位置 */}
+        <div 
+          className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-white mb-8"
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={handleDrop}
+        >
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            className="hidden" 
+            onChange={handleFileInputChange}
+            accept=".pdf,.txt,.doc,.docx"
+          />
+          
+          <div className="py-10">
+            <div className="mb-6 text-gray-600">
+              将文件拖到此区域，或 
+              <button 
+                type="button"
+                className="text-indigo-600 hover:underline ml-1"
+                onClick={openFileSelector}
+              >
+                点击上传
+              </button>
+            </div>
+            <div className="text-sm text-gray-400">支持TXT、DOC、DOCX 最多可上传 10 个附件</div>
+          </div>
+          
+          {/* 文件预览 - 只在用户上传文件后显示 */}
+          {previewInfo && (
+            <div className="mt-6 border border-gray-200 rounded-lg p-3 flex items-center">
+              <div className="w-10 h-10 bg-indigo-50 flex items-center justify-center mr-3 rounded">
+                <Icon icon="ri:file-word-2-line" className="w-6 h-6 text-indigo-500" />
+              </div>
+              <div className="flex-grow text-left">
+                <div className="font-medium">{previewInfo.name}</div>
+                <div className="text-xs text-gray-500">{previewInfo.size}</div>
+              </div>
+              <div className="text-green-500">
+                <Icon icon="ri:check-line" className="w-5 h-5" />
+              </div>
+            </div>
+          )}
+        </div>
+        
         {/* 标签选择 */}
         <div className="mb-8">
           <div className="text-gray-700 mb-2">数据标签 (非必填，用于给文档打标，便于后续召回过滤)</div>
@@ -139,57 +192,61 @@ function KnowledgeUploadPage() {
             {/* 标签下拉菜单 */}
             {showTagsDropdown && (
               <div className="absolute left-0 right-0 top-full mt-1 bg-white shadow-lg rounded-lg border border-gray-200 z-10">
-                <div className="p-2 border-b flex items-center">
+                {/* 添加新标签按钮 */}
+                <div 
+                  className="p-2 border-b flex items-center cursor-pointer hover:bg-gray-50"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowNewTagInput(true);
+                  }}
+                >
                   <Icon icon="ri:add-line" className="text-indigo-600 w-5 h-5 mr-1" />
                   <span className="text-indigo-600">增加标签</span>
                 </div>
-                <div className="p-2 text-gray-500">无选项</div>
+                
+                {/* 新标签输入 */}
+                {showNewTagInput ? (
+                  <div className="p-2 border-b" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex items-center">
+                      <input
+                        type="text"
+                        className="flex-grow border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        placeholder="请输入标签名称"
+                        value={newTagInput}
+                        onChange={(e) => setNewTagInput(e.target.value)}
+                        autoFocus
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            handleAddTag(newTagInput);
+                          }
+                        }}
+                      />
+                      <button
+                        className="ml-2 px-3 py-1 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700"
+                        onClick={() => handleAddTag(newTagInput)}
+                      >
+                        添加
+                      </button>
+                      <button
+                        className="ml-1 px-3 py-1 border border-gray-300 text-gray-600 text-sm rounded hover:bg-gray-50"
+                        onClick={() => {
+                          setShowNewTagInput(false);
+                          setNewTagInput('');
+                        }}
+                      >
+                        取消
+                      </button>
+                    </div>
+                  </div>
+                ) : null}
+                
+                {/* 无标签选项提示 */}
+                {!showNewTagInput && (
+                  <div className="p-2 text-gray-500">无选项</div>
+                )}
               </div>
             )}
           </div>
-        </div>
-        
-        {/* 文件上传区域 */}
-        <div 
-          className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-white"
-          onDragOver={(e) => e.preventDefault()}
-          onDrop={handleDrop}
-        >
-          <input 
-            type="file" 
-            ref={fileInputRef} 
-            className="hidden" 
-            onChange={handleFileInputChange}
-            accept=".pdf,.txt,.md,.markdown,.html,.doc,.docx"
-          />
-          
-          <div className="mb-6 text-gray-600">
-            将文件拖到此区域，或 
-            <button 
-              type="button"
-              className="text-indigo-600 hover:underline ml-1"
-              onClick={openFileSelector}
-            >
-              点击上传
-            </button>
-          </div>
-          <div className="text-sm text-gray-400">支持 PDF、TXT、MARKDOWN、HTML、DOC、DOCX 最多可上传 10 个附件</div>
-          
-          {/* 文件预览 - 只在用户上传文件后显示 */}
-          {previewInfo && (
-            <div className="mt-6 border border-gray-200 rounded-lg p-3 flex items-center">
-              <div className="w-10 h-10 bg-indigo-50 flex items-center justify-center mr-3 rounded">
-                <Icon icon="ri:file-word-2-line" className="w-6 h-6 text-indigo-500" />
-              </div>
-              <div className="flex-grow text-left">
-                <div className="font-medium">{previewInfo.name}</div>
-                <div className="text-xs text-gray-500">{previewInfo.size}</div>
-              </div>
-              <div className="text-green-500">
-                <Icon icon="ri:check-line" className="w-5 h-5" />
-              </div>
-            </div>
-          )}
         </div>
       </div>
       
