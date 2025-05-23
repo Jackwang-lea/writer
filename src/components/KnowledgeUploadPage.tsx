@@ -30,17 +30,15 @@ function KnowledgeUploadPage() {
   
   // 处理下一步
   const handleNext = () => {
-    if (currentStep === 1) {
-      if (!uploadedFile && !previewInfo) {
-        alert('请先上传文件');
-        return;
-      }
-      setCurrentStep(2);
-    } else if (currentStep === 2) {
-      // 处理分段清洗的逻辑
-      console.log('处理分段清洗，选择的方式:', segmentMethod);
-      setCurrentStep(3);
+    if (!uploadedFile && !previewInfo) {
+      alert('请先上传文件');
+      return;
     }
+    
+    console.log('处理下一步，选择的标签:', selectedTags);
+    // 实际项目中，这里会提交数据到后端
+    alert('上传成功！');
+    navigate(`/knowledge/${knowledgeId}`);
   };
   
   // 处理上一步

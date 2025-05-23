@@ -97,7 +97,7 @@ function KnowledgeDetailPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [showUploadModal, setShowUploadModal] = useState(false);
   
-  const handleNextStep = (type: 'text' | 'image' | 'online' | 'notion' | 'custom') => {
+  const handleNextStep = () => {
     // 关闭当前模态框
     setShowUploadModal(false);
     // 跳转到上传页面
