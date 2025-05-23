@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { useNavigate, useParams, Link } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Icon } from '@iconify/react';
 import StepIndicator from './StepIndicator';
 import FileUpload from './FileUpload';
 import TagSelector from './TagSelector';
+import SegmentStep from './SegmentStep';
+import PageLayout from './PageLayout';
 
 function KnowledgeUploadPage() {
   const navigate = useNavigate();
@@ -80,11 +82,6 @@ function KnowledgeUploadPage() {
     }
   };
   
-  // 渲染步骤指示器
-  const renderStepIndicator = () => {
-    return <StepIndicator steps={steps} currentStep={currentStep} />;
-  };
-  
   // 渲染上传步骤
   const renderUploadStep = () => {
     return (
@@ -104,72 +101,40 @@ function KnowledgeUploadPage() {
   
   // 渲染分段清洗步骤
   const renderSegmentStep = () => {
+    const handlePreviewClick = () => {
+      // 处理预览点击事件
+      console.log('预览分段');
+    };
+
     return (
-      <div className="bg-white rounded-lg p-6">
-        <div className="space-y-4">
-          {/* 自定义选项 */}
-          <div className="p-6 border border-indigo-100 bg-indigo-50 rounded-lg">
-            <div className="flex items-center">
-              <div className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center">
-                <Icon icon="ri:settings-4-line" className="w-6 h-6 text-white" />
-              </div>
-              <div className="ml-4">
-                <div className="text-lg font-medium">自定义</div>
-                <div className="text-gray-600 mt-1">优先按换行符切分，超出设置的最大分段长度后，按最大分段长度和分段重叠长度处理</div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div className="mt-4 text-sm text-gray-500">
-          共 1 文档
-          <button className="text-indigo-600 hover:underline ml-4">分段预览</button>
-        </div>
-      </div>
+      <SegmentStep
+        documentCount={1}
+        onPreviewClick={handlePreviewClick}
+      />
     );
   };
   
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* 面包屑导航 */}
-      <div className="bg-white p-4 flex items-center border-b">
-        <Link 
-          to="/knowledge/new"
-          className="flex items-center text-gray-600 hover:text-gray-900"
-        >
-          <Icon icon="ri:arrow-left-s-line" className="w-5 h-5 mr-1" />
-          <span>添加</span>
-        </Link>
-      </div>
-      
-      {/* 主内容区域 */}
-      <div className="max-w-[800px] mx-auto px-6 pb-10 pt-8">
-        {/* 步骤指示器 */}
-        {renderStepIndicator()}
-        
-        {/* 步骤内容 */}
+  // 渲染当前步骤内容
+  const renderCurrentStepContent = () => {
+    return (
+      <>
+        <StepIndicator steps={steps} currentStep={currentStep} />
         {currentStep === 1 && renderUploadStep()}
         {currentStep === 2 && renderSegmentStep()}
-      </div>
-      
-      {/* 底部按钮 */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 flex justify-end">
-        {currentStep > 1 && (
-          <button 
-            className="px-4 py-2 border border-gray-300 rounded-md text-gray-600 mr-2 hover:bg-gray-50"
-            onClick={handlePrev}
-          >
-            上一步
-          </button>
-        )}
-        <button 
-          className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
-          onClick={handleNext}
-        >
-          下一步
-        </button>
-      </div>
-    </div>
+      </>
+    );
+  };
+
+  return (
+    <PageLayout
+      backTo="/knowledge/new"
+      backText="添加"
+      showPrevButton={currentStep > 1}
+      onPrev={handlePrev}
+      onNext={handleNext}
+    >
+      {renderCurrentStepContent()}
+    </PageLayout>
   );
 }
 
