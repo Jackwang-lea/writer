@@ -13,7 +13,7 @@ function ChaptersPage() {
   const handleCharacterSelect = (character: { id: string; name: string }) => {
     console.log('Selected character:', character);
   };
-  
+
   return (
     <div className="w-full h-screen flex">
       {/* 侧边栏 */}
