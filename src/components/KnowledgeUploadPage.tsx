@@ -25,8 +25,6 @@ function KnowledgeUploadPage() {
   const [newTagInput, setNewTagInput] = useState('');
   // 是否显示新标签输入
   const [showNewTagInput, setShowNewTagInput] = useState(false);
-  // 分段方式
-  const [segmentMethod, setSegmentMethod] = useState<'smart' | 'custom'>('smart');
   
   // 处理下一步
   const handleNext = () => {

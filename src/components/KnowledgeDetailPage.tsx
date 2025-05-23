@@ -94,7 +94,6 @@ function KnowledgeDetailPage() {
   const knowledge = knowledgeId ? knowledgeDetails[knowledgeId as keyof typeof knowledgeDetails] : null;
   
   const [searchText, setSearchText] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
   const [showUploadModal, setShowUploadModal] = useState(false);
   
   const handleNextStep = () => {
