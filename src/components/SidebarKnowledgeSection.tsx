@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Icon } from '@iconify/react';
 import { useNavigate } from 'react-router-dom';
 import SidebarSectionHeader from './SidebarSectionHeader';
+import KnowledgeListItem from './KnowledgeListItem';
 
 interface SidebarKnowledgeSectionProps {
   onKnowledgeItemClick?: () => void;
@@ -37,6 +38,10 @@ function SidebarKnowledgeSection({ onKnowledgeItemClick }: SidebarKnowledgeSecti
     navigate('/knowledge/new');
   };
 
+  const handleKnowledgeClick = (id: string) => {
+    navigate(`/knowledge/${id}`);
+  };
+
   return (
     <div>
       <SidebarSectionHeader
@@ -50,17 +55,12 @@ function SidebarKnowledgeSection({ onKnowledgeItemClick }: SidebarKnowledgeSecti
       {isExpanded && (
         <div className="ml-7 space-y-2 mt-2">
           {knowledgeItems.map(item => (
-            <div 
-              key={item.id} 
-              className="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded"
-              onClick={() => navigate(`/knowledge/${item.id}`)}
-            >
-              <Icon 
-                icon="ri:file-list-line" 
-                className="w-5 h-5 mr-2 text-gray-500"
-              />
-              <span className="flex-grow">{item.name}</span>
-            </div>
+            <KnowledgeListItem
+              key={item.id}
+              id={item.id}
+              name={item.name}
+              onClick={handleKnowledgeClick}
+            />
           ))}
         </div>
       )}
