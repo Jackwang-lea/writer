@@ -110,20 +110,6 @@ const Sidebar = () => {
               {/* 展开的视图和角色 */}
               {expandedItems[work.id] && (
                 <div className="ml-6">
-                  {/* 视图列表 */}
-                  {Object.entries(work.views).map(([view, enabled]) => 
-                    enabled && (
-                      <div
-                        key={view}
-                        className="flex items-center p-2 hover:bg-gray-50 rounded-md cursor-pointer"
-                        onClick={() => showToast()}
-                      >
-                        <Icon icon="ri:file-list-line" className="w-5 h-5 text-gray-500" />
-                        <span className="ml-2">{view}</span>
-                      </div>
-                    )
-                  )}
-
                   {/* 角色剧本部分 */}
                   {work.characters && (
                     <div>
@@ -184,13 +170,6 @@ const Sidebar = () => {
                                       </button>
                                     </div>
                                   ))}
-                                  <button
-                                    className="flex items-center p-2 text-gray-500 hover:text-gray-700 w-full"
-                                    onClick={handleAddScript}
-                                  >
-                                    <Icon icon="ri:add-line" className="w-5 h-5" />
-                                    <span className="ml-2">添加剧本</span>
-                                  </button>
                                 </div>
                               )}
                             </div>
@@ -206,14 +185,7 @@ const Sidebar = () => {
         </SidebarSection>
 
         {/* 知识库部分 */}
-        <SidebarSection
-          title="知识库"
-          isExpanded={expandedSections.knowledge}
-          onToggle={() => toggleSection('knowledge')}
-          onAdd={() => navigate('/knowledge/new')}
-        >
-          <SidebarKnowledgeSection />
-        </SidebarSection>
+        <SidebarKnowledgeSection />
 
         {/* 工作流部分 */}
         <SidebarSection

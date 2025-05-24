@@ -28,12 +28,7 @@ export function useSidebarWorks() {
     {
       id: 'work-1',
       name: '《大纲》',
-      views: {
-        outline: true,
-        characters: true,
-        hostManual: true,
-        materials: true
-      },
+      views: {},
       characters: [
         {
           id: 'char-1',

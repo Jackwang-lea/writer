@@ -10,19 +10,14 @@ export interface Script {
 export interface Character {
   id: string;
   name: string;
-  type: 'draft' | 'final';
+  type?: 'draft' | 'final';
   scripts?: Script[];
 }
 
 export interface Work {
   id: string;
   name: string;
-  lastVisitedView?: string;
+  views?: Record<string, boolean>;
   characters?: Character[];
-  views: {
-    outline: boolean;
-    characters: boolean;
-    hostManual: boolean;
-    materials: boolean;
-  };
+  lastVisitedView?: string;
 } 

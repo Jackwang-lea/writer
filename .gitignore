@@ -40,3 +40,5 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+REACT_ISSUES.md
+KNOWLEDGE_BASE_FLOW.md
