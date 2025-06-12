@@ -171,15 +171,4 @@ src/
 - [Shields.io](https://shields.io/) - 项目徽章服务
 - [zeabur](https://zeabur.com/projects) - zeabur支持
 
----
 
-<div align="center">
-
-**Writer.AI @千帆叙梦**
-
-[![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github)](https://github.com)
-[![Website](https://img.shields.io/badge/Website-4285F4?style=for-the-badge&logo=google-chrome&logoColor=white)](https://your-website.com)
-
-Made with ❤️ by the Writer.AI team
-
-</div>
